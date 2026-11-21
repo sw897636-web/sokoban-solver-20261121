@@ -16,7 +16,8 @@
 // clock, no randomness, fixed iteration orders, and a node cap (work, not
 // time) as the only cut-off, so two runs write identical bytes.
 //
-// Usage: node main.ts [inputDir] [outputDir]  (defaults /input and /output)
+// Usage: node main.ts [inputDir] [outputDir]  (defaults /input and /output,
+// or MAKEFUN_INPUT_DIR / MAKEFUN_OUTPUT_DIR when set by the harness)
 // Reads <inputDir>/<id>/level.txt for every sub-directory id and writes
 // <outputDir>/<id>/solution.txt with the player's moves (u/d/l/r).
 
@@ -553,8 +554,12 @@ function solveWhole(W, H, wall, goal, boxes, player) {
 }
 
 function main() {
-  const inputDir = process.argv[2] || '/input';
-  const outputDir = process.argv[3] || '/output';
+  // The harness mounts /input and /output in the grader's container; outside
+  // one it passes the same directories as MAKEFUN_INPUT_DIR and
+  // MAKEFUN_OUTPUT_DIR (the kit generator and scorer use the same stand-ins).
+  // Explicit arguments win, then the environment, then the container paths.
+  const inputDir = process.argv[2] || process.env.MAKEFUN_INPUT_DIR || '/input';
+  const outputDir = process.argv[3] || process.env.MAKEFUN_OUTPUT_DIR || '/output';
   let ids = [];
   try {
     ids = readdirSync(inputDir, { withFileTypes: true })
